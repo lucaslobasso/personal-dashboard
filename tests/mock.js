@@ -7,12 +7,16 @@ try { localStorage.setItem("pdmock:token", JSON.stringify("mock-token")); } catc
 const b64encode = (t) => { const b = new TextEncoder().encode(t); let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000)); return btoa(s); };
 const b64decode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s), (c) => c.charCodeAt(0)));
 const mem = new Map();
+const commits = [];
+// Test hooks (tests/e2e.mjs): inspect commits, or seed a file's content before an action.
+window.__mock = { commits, offline: false, seed: (key, text) => mem.set(key, text) };
 const realFetch = window.fetch.bind(window);
 const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
 
 window.fetch = async (url, opts = {}) => {
   const u = String(url);
   if (!u.startsWith("https://api.github.com")) return realFetch(url, opts);
+  if (window.__mock.offline) throw new TypeError("Failed to fetch");
   const path = new URL(u).pathname;
   const method = (opts.method || "GET").toUpperCase();
   const m = /^\/repos\/[^/]+\/([^/]+)\/contents\/(.+)$/.exec(path);
@@ -22,6 +26,7 @@ window.fetch = async (url, opts = {}) => {
   if (method === "PUT") {
     const body = JSON.parse(opts.body);
     mem.set(key, b64decode(body.content));
+    commits.push({ key, message: body.message, text: mem.get(key) });
     console.log("[mock commit]", key, "|", body.message.replace(/\n+/g, " | "));
     return json({ content: { sha: `mem-${Date.now()}` } });
   }

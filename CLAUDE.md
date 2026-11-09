@@ -29,4 +29,6 @@ None. This is a code repo: make normal commits with a short sentence-case messag
 
 ## Helper scripts
 - `python scripts/serve.py [port] [--mock]`: local server (stdlib, correct MIME types, no caching). With `--mock`, open `/mock.html` to run on the local personal-* clones without a token.
-- `node tests/test.mjs`: parity tests against the sibling clones (JS ports vs `study.py stats/find`, pending.json byte-for-byte round trip, conflict retry). Run after touching `modules/` or `core/github.js`.
+- `node tests/test.mjs`: unit + parity tests against the sibling clones (JS ports vs `study.py stats/find`, byte-exact YAML and pending.json round trips, conflict retry, offline fallback). Run after touching `modules/` or `core/`.
+- `node tests/e2e.mjs`: browser end-to-end over mock mode via headless Edge/Chrome (DevTools protocol, no deps): add/edit/undo/remove with exact committed bytes, cart reset, search, settings, offline, token chip, 360px layout, zero console/CSP errors. `SHOTS=<dir>` saves screenshots. Run before pushing UI changes.
+- `docs/roadmap.md`: prioritized growth ideas and the constraints they must respect.

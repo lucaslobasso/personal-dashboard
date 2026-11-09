@@ -26,7 +26,7 @@ export default {
     const counts = Object.fromEntries(FILES.map((f) => [f, all.filter((x) => x.file === f).length]));
     ctx.frame.setBadge(all.length.toLocaleString());
 
-    const q = h("input", { type: "search", class: "input", placeholder: "Search term, reading, meaning, structure, tag…", "aria-label": "Search", autocomplete: "off", spellcheck: "false" });
+    const q = h("input", { type: "search", class: "input", placeholder: "Search kana, kanji, meaning, tag…", "aria-label": "Search", autocomplete: "off", spellcheck: "false" });
     const fFile = select([["", "All types"], ...FILES.filter((f) => counts[f]).map((f) => [f, `${f} (${counts[f]})`])], "", { class: "input", "aria-label": "Type" });
     const fLesson = select([["", "All lessons"], ...lessons.map((n) => [String(n), `Lesson ${n}`])], "", { class: "input", "aria-label": "Lesson" });
     const fStatus = select([["", "Any status"], ...STATUSES.map((s) => [s, s]), ["due", "due for review"]], "", { class: "input", "aria-label": "Status" });
