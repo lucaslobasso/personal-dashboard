@@ -10,8 +10,15 @@ import { find, isDue, FILES } from "../modules/japanese/data.js";
 import { parsePending, formatPending, slugify, opAdd, opEdit, opRemove } from "../modules/groceries/format.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const JP = join(here, "..", "..", "personal-japanese");
-const GR = join(here, "..", "..", "personal-groceries");
+// Nearest ancestor folder holding the clone (works from a git worktree too).
+const sibling = (name) => {
+  for (let d = join(here, ".."); ; d = dirname(d)) {
+    if (existsSync(join(d, "..", name))) return join(d, "..", name);
+    if (dirname(d) === d) return join(here, "..", "..", name);
+  }
+};
+const JP = sibling("personal-japanese");
+const GR = sibling("personal-groceries");
 let failed = 0, passed = 0;
 const ok = (cond, msg) => { if (cond) passed++; else { failed++; console.log("FAIL", msg); } };
 const eq = (a, b, msg) => ok(JSON.stringify(a) === JSON.stringify(b), `${msg}\n  got:  ${JSON.stringify(a)}\n  want: ${JSON.stringify(b)}`);
