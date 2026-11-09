@@ -1,6 +1,6 @@
 # personal-dashboard
 
-A modular static dashboard (loosely inspired by Glance) for the user's Claude-managed personal-* data repos, for day-to-day use without the agent. **Today** gives the overview. Groceries: edit the list, one-tap usual items, mark what was bought. Japanese: flashcard reviews, search, stats. Work: tasks/deadlines and hours. Media: queue movie/series requests for the home PC. Anything that needs judgment (matching Josimar products for the cart, explanations, quizzes with feedback) stays with Claude in those repos, via a "copy prompt + open claude.ai/code" handoff.
+A modular static dashboard (loosely inspired by Glance) for the user's Claude-managed personal-* data repos, for day-to-day use without the agent. **Today** gives the overview. Groceries: edit the list, one-tap usual items, mark what was bought. Japanese: flashcard reviews, per-lesson notes with sensei, search, stats. Work: tasks/deadlines and hours. Media: queue movie/series requests for the home PC. Anything that needs judgment (matching Josimar products for the cart, explanations, quizzes with feedback) stays with Claude in those repos, via a "copy prompt + open claude.ai/code" handoff.
 It runs entirely in the browser: GitHub Pages serves the files, and widgets talk straight to the GitHub API with a fine-grained token kept in the browser's localStorage. No backend, no build step, no dependencies.
 Skills: none (code repo, edited deliberately).
 
@@ -9,6 +9,7 @@ Skills: none (code repo, edited deliberately).
 - **Writes are limited by design.** Each must follow the target repo's CLAUDE.md schema and file style exactly (diffs should look like Claude's own edits), with byte-parity tests against that repo's scripts:
   - groceries: `pending.json` (add/edit/remove; a list change also resets a built `cart.json` to `{}`, like /remove), `usual.json` (pins). **Mark bought** writes `history/<date>.json`, `pending.json`, `products.json` (`confirmed: true` only) and `cart.json`, like /bought. Never match products or build carts (Claude's /cart).
   - japanese: **SRS stat fields only** (`times_seen`, `times_wrong`, `streak`, `status`, `last_reviewed`, plus missing stat keys) via the `record` port. Never notes, examples, terms or anything from `source: sensei`.
+    Plus the user's own lesson notes in `sessions/YYYY-MM-DD.md` (`japanese-notes`: append a bullet under `## Notes`/`## Ask sensei`, or save an edit that is refused if the file changed since it was opened). /log-lesson turns them into items.
   - work: `data/items.json` and `data/hours/YYYY-MM.json`, in `work.py`'s format.
   - arr: `state/requests.json` only (queue, pick, cancel, retry). Adding to Radarr/Sonarr is the home PC worker's job (`arr.py requests`).
 - Multi-file changes go through `commitFiles` (one atomic commit, re-applied if `main` moved). Data commits: `sync: <date> <files>` with a `dashboard: …` body line (`syncMessage`).
@@ -31,7 +32,7 @@ None. This is a code repo: make normal commits with a short sentence-case messag
 - `core/ui.js`: `h`, `card`, `toast`, `select`, `extLink`, `empty`, `handoff`, `today`, `daysFrom`, `debounce`. `core/store.js`: guarded localStorage. `core/settings.js`: token screen.
 - `modules/index.js`: registry type → lazy import.
   - `modules/groceries/`: list, cart, bought, history, summary, format.
-  - `modules/japanese/`: review, search, stats, due, data, yaml.
+  - `modules/japanese/`: review, notes, search, stats, due, data, yaml.
   - `modules/work/`: items, hours, format.
   - `modules/media/`: requests, summary.
 - `mock.html` + `tests/mock.js`: offline preview on the sibling clones (`serve.py --mock`), emulating the Contents and Git Data APIs. Writes stay in memory.
