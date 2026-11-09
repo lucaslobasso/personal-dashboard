@@ -25,7 +25,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def mock(self, rel):
         repo, _, sub = rel.partition("/")
-        base = (ROOT.parent / repo).resolve()
+        # Nearest ancestor folder holding the clone (works from a git worktree too).
+        base = next(((a / repo).resolve() for a in ROOT.parents if (a / repo).is_dir()), ROOT.parent / repo)
         target = (base / sub).resolve()
         if not repo.startswith("personal-") or base not in (target, *target.parents) or ".git" in target.parts or not target.exists():
             return self.send_error(404)

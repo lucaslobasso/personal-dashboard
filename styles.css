@@ -255,7 +255,7 @@ details > summary { cursor: pointer; color: var(--text-2); font-size: 13px; padd
 .settings { max-width: 640px; margin: 0 auto; }
 .settings .input { flex: 1 1 260px; }
 .steps { padding-left: 20px; margin: 0; }
-.steps .sub { list-style: none; margin: 4px 0 8px; }
+.steps .sub { margin: 4px 0 8px; }
 .checks li { font-size: 13.5px; padding: 2px 0; }
 .checks .ok { color: var(--ok); }
 .checks .bad { color: var(--danger); }
