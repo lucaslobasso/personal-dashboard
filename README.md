@@ -19,8 +19,9 @@ Static site (GitHub Pages) + GitHub API. No backend, no build, no dependencies. 
 Still done by talking to Claude in each repo: `/cart`, `/bought` (groceries); `/quiz`, `/explain`, `/review`, `/log-lesson` (Japanese).
 
 ## Setup (once per device)
-1. Create a [fine-grained token](https://github.com/settings/personal-access-tokens/new): Repository access → *Only select repositories* → `personal-groceries`, `personal-japanese`. Permissions → **Contents**: *Read and write* (needed for groceries; Japanese is only ever read).
-2. Open the site, paste the token under ⚙ Settings, then **Save & test**.
+1. Open the site → ⚙ Settings → **Create token on GitHub**. It opens a [pre-filled fine-grained token form](https://github.com/settings/personal-access-tokens/new?name=personal-dashboard&target_name=lucaslobasso&expires_in=366&contents=write) (name, 1-year expiry, Contents: read and write).
+   The only manual step: Repository access → *Only select repositories* → `personal-groceries`, `personal-japanese` (GitHub has no URL parameter for this). Permissions cover the whole token, so Japanese gets write access too, but the dashboard never writes there.
+2. **Generate token**, paste it under ⚙ Settings, then **Save & test**.
 3. Phone: browser menu → *Add to Home screen*.
 
 ## Layout and config
