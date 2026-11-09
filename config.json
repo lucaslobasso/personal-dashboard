@@ -38,6 +38,7 @@
       "columns": [
         { "size": "full", "widgets": [
           { "type": "japanese-review", "source": "japanese", "size": 20 },
+          { "type": "japanese-notes", "source": "japanese" },
           { "type": "japanese-search", "source": "japanese", "limit": 30, "browse": false }
         ] },
         { "size": "small", "widgets": [

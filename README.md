@@ -1,6 +1,6 @@
 # personal-dashboard
 
-A small, modular personal hub over my Claude-managed data repos: [personal-groceries](https://github.com/lucaslobasso/personal-groceries), [personal-japanese](https://github.com/lucaslobasso/personal-japanese), [personal-work](https://github.com/lucaslobasso/personal-work) and [personal-arr](https://github.com/lucaslobasso/personal-arr). It covers what doesn't need the agent. **Today** gives the day at a glance. The grocery list has one-tap usual items and "mark bought". Japanese has flashcards, search and stats. Work has tasks, deadlines and hours. Media queues movie/series requests for the home PC.
+A small, modular personal hub over my Claude-managed data repos: [personal-groceries](https://github.com/lucaslobasso/personal-groceries), [personal-japanese](https://github.com/lucaslobasso/personal-japanese), [personal-work](https://github.com/lucaslobasso/personal-work) and [personal-arr](https://github.com/lucaslobasso/personal-arr). It covers what doesn't need the agent. **Today** gives the day at a glance. The grocery list has one-tap usual items and "mark bought". Japanese has flashcards, lesson notes, search and stats. Work has tasks, deadlines and hours. Media queues movie/series requests for the home PC.
 
 Static site (GitHub Pages) + GitHub API. No backend, no build, no dependencies. The data repos stay private; this repo has no data or secrets.
 
@@ -15,6 +15,7 @@ Static site (GitHub Pages) + GitHub API. No backend, no build, no dependencies. 
 | `groceries-history` | Past purchases, newest first (`limit`) | – |
 | `groceries-summary` | Today: what's pending, days since the last delivery with a nudge (`cadenceDays`), cart state | – |
 | `japanese-review` | Flashcards for due + new items (`study.py due`), JP→EN or EN→JP. One commit per session (`size`) | SRS stats only |
+| `japanese-notes` | Per-lesson notes with sensei in `sessions/YYYY-MM-DD.md`: quick-add to Notes / Ask sensei (creates the day's file), edit, "Process with Claude" → `/log-lesson` (`limit`) | `sessions/*.md` |
 | `japanese-search` | Search term/reading/meaning/structure/tags like `study.py find`. Filter by type, lesson, status/due; item detail (`limit`, `browse`) | – |
 | `japanese-stats` | Due/known/learning totals, per-file and per-lesson progress, weakest items (`weakest`, `lessons`) | – |
 | `japanese-due` | Today: cards due, "Review now", and the "Ask sensei" list from the latest lesson log | – |

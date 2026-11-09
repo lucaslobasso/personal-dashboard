@@ -188,6 +188,24 @@ try {
     const s = document.querySelector('[aria-label=Lesson]'); s.value = '5'; s.dispatchEvent(new Event('change'));`);
   check(await waitJs(`/^\\d+ results?/.test(document.querySelector('.search-bar + p')?.textContent) && [...document.querySelectorAll('.result')].length > 0`), "lesson filter browses lesson 5");
   check(await waitJs(`document.querySelectorAll('.stack-bar').length >= 3 && document.querySelector('.tile-value')`), "stats card renders tiles and bars");
+  await waitJs(`document.querySelector('[aria-label=Note]')`);
+  await js(`const f = document.querySelector('[aria-label=Note]').closest('form'); f.querySelector('[aria-label=Note]').value = '〜てしまう = regret';
+    f.querySelector('[aria-label=Section]').value = 'Notes'; f.requestSubmit();`);
+  c = await until(async () => (await commitsOf(`sessions/${today}.md`)).at(-1));
+  check(c?.text === `# ${today} — Lesson with sensei\n\n**Source:** sensei lesson.\n\n## Notes\n- 〜てしまう = regret\n\n## Ask sensei\n` && c.message.endsWith("dashboard: lesson note (notes)"), "quick note creates today's lesson file from the template");
+  await waitJs(`document.querySelector('.md')?.textContent.includes('regret')`);
+  await js(`const f = document.querySelector('[aria-label=Note]').closest('form'); f.querySelector('[aria-label=Note]').value = 'は vs が?';
+    f.querySelector('[aria-label=Section]').value = 'Ask sensei'; f.requestSubmit();`);
+  c = await until(async () => (await commitsOf(`sessions/${today}.md`)).find((x) => x.text.includes("- は vs が?")));
+  check(c?.text.endsWith("## Ask sensei\n- は vs が?\n"), "Ask sensei note lands in its section");
+  await waitJs(`document.querySelector('.md')?.textContent.includes('は vs が?')`);
+  await js(`[...document.querySelectorAll('.lesson-head button')].find(b => b.textContent === 'Edit').click();`);
+  await waitJs(`document.querySelector('.notes-text')`);
+  await js(`const t = document.querySelector('.notes-text'); t.value = t.value.replace('regret', 'regret / completion'); t.dispatchEvent(new Event('input'));
+    [...document.querySelectorAll('.lesson-view button')].find(b => b.textContent === 'Save').click();`);
+  c = await until(async () => (await commitsOf(`sessions/${today}.md`)).find((x) => x.message.endsWith("edit lesson notes")));
+  check(c?.text.includes("- 〜てしまう = regret / completion\n") && c.text.endsWith("- は vs が?\n"), "editing the full notes saves the text");
+  check(await waitJs(`!document.querySelector('.notes-text') && document.querySelector('.md')?.textContent.includes('completion')`), "after saving it shows the rendered notes");
 
   // ---------- media requests ----------
   console.log("media");
@@ -226,6 +244,7 @@ try {
   await js(`location.hash = '#/today';`);
   check(await waitJs(`document.querySelectorAll('.card').length === 5 && !document.querySelector('.loading') && !document.querySelector('.error')`), "Today renders all five widgets without errors");
   check(await waitJs(`document.body.textContent.includes('Write report') && document.body.textContent.includes('Review now') || document.body.textContent.includes('Practice')`), "Today shows this week's work and the review entry point");
+  check(await waitJs(`document.querySelector('.ask')?.textContent.includes('は vs が?')`), "Today shows the Ask sensei note from the dashboard");
 
   // ---------- resilience ----------
   console.log("resilience");

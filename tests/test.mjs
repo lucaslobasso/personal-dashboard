@@ -12,6 +12,9 @@ import { today } from "../core/ui.js";
 import { parsePending, formatPending, slugify, opAdd, opEdit, opRemove, rankUsual, formatUsual, parseUsual,
   formatProducts, formatHistory, boughtChanges } from "../modules/groceries/format.js";
 
+import { appendBullet, template } from "../modules/japanese/notes.js";
+import { askSensei } from "../modules/japanese/due.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 // Nearest ancestor folder holding the clone (works from a git worktree too).
 const sibling = (name) => {
@@ -271,6 +274,18 @@ if (existsSync(join(JP, "scripts/study.py"))) {
     eq(got.slice(0, 200), want.slice(0, 200), `find "${q}" (${want.length} hits)`);
   }
 } else console.log("skip: ../personal-japanese not found");
+
+// lesson notes: quick-add bullets land in the right section, compatible with askSensei
+{
+  let md = template("2026-11-12");
+  md = appendBullet(md, "Notes", "〜てしまう = regret / completion");
+  md = appendBullet(md, "Ask sensei", "difference between は and が here?");
+  md = appendBullet(md, "Notes", "  two\nlines ");
+  eq(md, "# 2026-11-12 — Lesson with sensei\n\n**Source:** sensei lesson.\n\n## Notes\n- 〜てしまう = regret / completion\n- two lines\n\n## Ask sensei\n- difference between は and が here?\n", "appendBullet fills sections in place");
+  eq(askSensei(md), ["difference between は and が here?"], "dashboard notes feed the Today 'Ask sensei' list");
+  eq(appendBullet("# x\n\n## Ask sensei\n- (none yet)\n", "Ask sensei", "q1"), "# x\n\n## Ask sensei\n- q1\n", "placeholder replaced");
+  eq(appendBullet("# x\r\n\r\nbody\r\n", "Notes", "n"), "# x\n\nbody\n\n## Notes\n- n\n", "missing section appended (CRLF normalized)");
+}
 
 console.log(`${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
