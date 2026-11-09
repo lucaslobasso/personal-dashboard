@@ -55,6 +55,7 @@ export function renderSettings(main, config, onSaved) {
           h("li", {}, "Under ", h("strong", {}, "Repository access"), " choose ", h("em", {}, "Only select repositories"), " and pick:",
             h("div", { class: "sub" }, Object.values(config.sources || {}).map((r) => h("div", {}, h("code", {}, r))))),
           h("li", {}, "Click ", h("strong", {}, "Generate token"), ", copy it, and paste it below. Once per device.")),
+        h("p", { class: "muted small" }, "Already have a token and a repo shows ✗ below? Edit the token on GitHub (Settings → Developer settings → Fine-grained tokens) and add that repository: no need for a new token or to paste it again."),
         h("form", { class: "row", onSubmit: save },
           input,
           h("button", { class: "btn btn-primary", type: "submit" }, "Save & test")),

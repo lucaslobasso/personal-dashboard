@@ -75,3 +75,46 @@ export function overdue(it) {
 
 export const isDue = (it) => { const o = overdue(it); return o != null && o >= 0; };
 export const errRate = (it) => (it.times_wrong || 0) / Math.max(it.times_seen || 0, 1);
+
+/**
+ * Port of study.py cmd_due: pool = [{ file, item }] in file order. Returns { pick, due, fresh }.
+ * mixed: up to 70% due reviews, topped up with new items, shuffled; review / new: only those.
+ */
+export function due(pool, n, mode = "mixed", random = Math.random) {
+  const rev = pool.filter(({ item }) => isDue(item))
+    .sort((a, b) => ((a.item.status === "known") - (b.item.status === "known")) || (errRate(b.item) - errRate(a.item)) || ((overdue(b.item) || 0) - (overdue(a.item) || 0)));
+  const fresh = pool.filter(({ item }) => (item.status || "new") === "new")
+    .sort((a, b) => (lesson(a.item) - lesson(b.item)) || (FILES.indexOf(a.file) - FILES.indexOf(b.file)));
+  let pick;
+  if (mode === "review") pick = rev.slice(0, n);
+  else if (mode === "new") pick = fresh.slice(0, n);
+  else {
+    const r = rev.slice(0, Math.max(Math.floor((n * 7) / 10), n - fresh.length));
+    pick = shuffle([...r, ...fresh.slice(0, n - r.length)], random);
+  }
+  return { pick, due: rev.length, fresh: fresh.length };
+}
+
+function shuffle(a, random) {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+const STATS = { date_learned: null, last_reviewed: null, times_seen: 0, times_wrong: 0, streak: 0, status: "new" };
+
+/** Port of study.py cmd_record for one answer. Returns a new item (key order like Python's setdefault). */
+export function record(item, result, todayStr) {
+  const it = { ...item };
+  for (const [k, v] of Object.entries(STATS)) if (!(k in it)) it[k] = v;
+  it.times_seen += 1;
+  it.last_reviewed = todayStr;
+  if (result === "right") {
+    it.streak = it.status === "new" ? Math.max(it.streak + 1, 2) : it.streak + 1;
+    it.status = it.streak >= 3 ? "known" : "learning";
+  } else if (result === "wrong") {
+    it.times_wrong += 1;
+    it.streak = 0;
+    it.status = "learning";
+  } else throw new Error(`result must be right|wrong, got ${result}`);
+  return it;
+}

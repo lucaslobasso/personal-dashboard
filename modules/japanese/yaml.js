@@ -63,6 +63,32 @@ export function parseLine(s) {
   return mapping();
 }
 
+// Port of study.py's q(): value serializer used by Store.save(). Byte-exact on all data lines
+// (tests/test.mjs re-serializes every line and compares).
+export const q = (v) => v == null ? "null" : typeof v === "boolean" ? String(v) : Number.isInteger(v) ? String(v)
+  : Array.isArray(v) ? "[" + v.map(q).join(", ") + "]" : JSON.stringify(String(v));
+
+export const formatLine = (item) => "- {" + Object.entries(item).map(([k, v]) => `${k}: ${q(v)}`).join(", ") + "}";
+
+/**
+ * Rewrite only the item lines `update(item)` changes (returns a new item, or null to keep the
+ * line); every other line stays byte-identical. Returns the new text, or null if nothing changed.
+ */
+export function applyRecords(text, update, name = "data") {
+  let changed = false;
+  const out = text.split("\n").map((line, n) => {
+    if (!line.startsWith("- {")) return line;
+    let item;
+    try { item = parseLine(line.slice(2)); } catch (e) { throw new Error(`${name}.yaml:${n + 1}: cannot parse (${e.message})`); }
+    const next = update(item);
+    if (!next) return line;
+    const s = formatLine(next);
+    if (s !== line) changed = true;
+    return s;
+  });
+  return changed ? out.join("\n") : null;
+}
+
 export function parseFile(text, name = "data") {
   const items = [];
   text.split(/\r?\n/).forEach((line, n) => {

@@ -14,6 +14,7 @@ const DETAIL_FIELDS = [
 export default {
   type: "japanese-search",
   title: "Japanese",
+  watch: FILES.map((f) => `data/${f}.yaml`), // refresh after a review session saves
 
   async load(ctx) {
     return loadAll(ctx.gh);

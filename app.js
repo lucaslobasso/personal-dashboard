@@ -73,6 +73,9 @@ function route() {
     renderPage(main, page);
   }
   document.querySelectorAll("[data-page]").forEach((a) => a.classList.toggle("active", a.dataset.page === pageSlug));
+  // On narrow screens the tab bar scrolls: keep the current page's tab visible.
+  const tab = document.querySelector(".tabs .active");
+  if (tab) tab.parentElement.scrollLeft = Math.max(0, tab.offsetLeft - (tab.parentElement.clientWidth - tab.offsetWidth) / 2);
 }
 
 function renderPage(main, page) {
