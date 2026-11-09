@@ -1,0 +1,11 @@
+{
+  "model": "sonnet",
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/serve.py *)",
+      "Bash(python3 scripts/serve.py *)",
+      "Bash(node tests/test.mjs)",
+      "Bash(node --check *)"
+    ]
+  }
+}

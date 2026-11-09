@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Only so Node treats the modules as ESM when running tests/test.mjs. No dependencies, no build."
+}
