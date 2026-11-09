@@ -39,6 +39,7 @@ export function renderSettings(main, config, onSaved) {
     e.preventDefault();
     if (!input.value.trim()) return toast("Paste a token first.", { error: true });
     if (!token.set(input.value)) return toast("This browser blocks local storage, so the token can't be saved.", { error: true });
+    store.set("tokenSavedAt", Date.now());
     await test();
     onSaved?.();
   }

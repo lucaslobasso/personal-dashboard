@@ -96,6 +96,11 @@ export async function getFile(repo, path, { optional = false } = {}) {
     return { text, sha: j.sha };
   } catch (e) {
     if (optional && e.status === 404) return null;
+    // Offline: fall back to the last copy we saw, so the dashboard still opens (writes will fail loudly).
+    if (e.status === 0 && cached) {
+      globalThis.dispatchEvent?.(new Event("pd:offline"));
+      return { text: cached.text, sha: cached.sha, stale: true };
+    }
     throw e;
   }
 }

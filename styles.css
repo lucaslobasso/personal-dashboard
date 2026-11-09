@@ -6,7 +6,7 @@
   --border: #e3e1dc;
   --text: #1d1d1b;
   --text-2: #55554f;
-  --muted: #7a7a73;
+  --muted: #696962; /* AA on surface, surface-2 and bg */
   --accent: #256abf;
   --accent-ink: #ffffff;
   --accent-soft: #e4eefb;
@@ -87,8 +87,10 @@ code { font-size: 12px; }
 }
 .tabs a:hover { background: var(--surface-2); }
 .tabs a.active { background: var(--text); color: var(--bg); }
+@media (max-width: 400px) { .top { gap: 8px; } .tabs a { padding: 6px 10px; } }
 .top-actions { display: flex; gap: 4px; }
 .top-actions .active { background: var(--surface-2); }
+.warn-chip { font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--sensei-soft); color: var(--sensei); text-decoration: none; white-space: nowrap; }
 
 /* ---------- columns (Glance-style: small = fixed rail, full = flexible) ---------- */
 main { padding: 16px; max-width: 1400px; margin: 0 auto; }
@@ -119,6 +121,7 @@ main { padding: 16px; max-width: 1400px; margin: 0 auto; }
 .loading { color: var(--muted); padding: 8px 0; }
 .error { color: var(--danger); background: var(--danger-soft); border-radius: 8px; padding: 10px 12px; }
 .error p { margin: 0 0 8px; }
+.error .row { gap: 8px; }
 .empty { color: var(--muted); text-align: center; padding: 14px 4px; }
 .empty p { margin: 2px 0; }
 .stack > * + * { margin-top: 10px; }

@@ -61,9 +61,12 @@ export function card(title) {
 }
 
 export function errorBox(err, onRetry) {
+  const auth = err?.status === 401 || err?.status === 403;
   return h("div", { class: "error" },
     h("p", {}, err?.message || String(err)),
-    onRetry && h("button", { class: "btn", onClick: onRetry }, "Retry"));
+    h("div", { class: "row" },
+      onRetry && h("button", { class: "btn", onClick: onRetry }, "Retry"),
+      auth && h("a", { class: "btn", href: "#/settings" }, "Open Settings")));
 }
 
 export const debounce = (fn, ms = 150) => {

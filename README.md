@@ -38,7 +38,10 @@ New modules: see "Adding a module" in [CLAUDE.md](CLAUDE.md).
 |---|---|
 | `python scripts/serve.py` | Serve at http://127.0.0.1:8765 (uses your real token and data) |
 | `python scripts/serve.py --mock` | Then open `/mock.html`: runs on the local `../personal-*` clones, no token, writes not saved |
-| `node tests/test.mjs` | Parity tests vs `study.py` and the real `pending.json`, plus the conflict-retry path |
+| `node tests/test.mjs` | Unit + parity tests vs `study.py` and the real data (byte-exact round trips, conflict retry, offline) |
+| `node tests/e2e.mjs` | Clicks through the real UI in headless Edge/Chrome on mock data (`SHOTS=dir` for screenshots) |
+
+Ideas and priorities: [docs/roadmap.md](docs/roadmap.md).
 
 ## How edits stay safe
 - Every write is a normal commit on the data repo's `main` (`sync: <date> pending.json` / `dashboard: add yerba`). Claude sessions pull on start, so they see it.

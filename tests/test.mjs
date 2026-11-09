@@ -45,6 +45,12 @@ if (existsSync(join(GR, "data/pending.json"))) {
   eq(formatPending(parsePending(text)), text, "pending.json round-trips byte for byte");
 } else console.log("skip: ../personal-groceries not found");
 
+// Node has no localStorage without a flag: give core/store.js an in-memory one.
+const mem = new Map();
+Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+  getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)),
+  removeItem: (k) => mem.delete(k), key: (i) => [...mem.keys()][i] ?? null, get length() { return mem.size; } } });
+
 // ---- github.updateFile: concurrent edit → 409 → re-read and re-apply (fake GitHub) ----
 {
   const { updateFile, b64encode, b64decode } = await import("../core/github.js");
@@ -65,6 +71,16 @@ if (existsSync(join(GR, "data/pending.json"))) {
   eq([r.changed, puts], [true, 2], "exactly one retry after a 409");
   const unchanged = await updateFile("me/repo", "data/cart.json", () => null, "msg");
   eq(unchanged.changed, false, "mutate returning null skips the write");
+
+  // offline: a network failure serves the last copy seen (flagged stale) instead of erroring
+  const { getFile } = await import("../core/github.js");
+  const fresh = await getFile("me/repo", "data/pending.json");
+  globalThis.fetch = async () => { throw new TypeError("Failed to fetch"); };
+  const off = await getFile("me/repo", "data/pending.json");
+  eq([off.text === fresh.text, off.stale], [true, true], "offline read falls back to the cached copy");
+  let threw = false;
+  try { await getFile("me/repo", "data/never-seen.json"); } catch (e) { threw = e.status === 0; }
+  ok(threw, "offline read of an uncached file still errors");
 }
 
 // ---- japanese ----
@@ -74,6 +90,23 @@ if (existsSync(join(JP, "scripts/study.py"))) {
     const p = join(JP, "data", `${f}.yaml`);
     if (existsSync(p)) all.push(...parseFile(readFileSync(p, "utf-8"), f).map((item) => ({ file: f, item })));
   }
+  // byte-exact round trip: re-serialize every item line with a port of study.py's q() writer
+  const q = (v) => v == null ? "null" : typeof v === "boolean" ? String(v) : Number.isInteger(v) ? String(v)
+    : Array.isArray(v) ? "[" + v.map(q).join(", ") + "]" : JSON.stringify(String(v));
+  let lines = 0;
+  const diffs = [];
+  for (const f of FILES) {
+    const p = join(JP, "data", `${f}.yaml`);
+    if (!existsSync(p)) continue;
+    for (const line of readFileSync(p, "utf-8").split("\n").filter((l) => l.startsWith("- {"))) {
+      lines++;
+      const [it] = parseFile(line, f);
+      const out = "- {" + Object.entries(it).map(([k, v]) => `${k}: ${q(v)}`).join(", ") + "}";
+      if (out !== line) diffs.push(`${f}: ${line.slice(0, 80)}`);
+    }
+  }
+  ok(lines > 0 && diffs.length === 0, `all ${lines} YAML item lines round-trip byte for byte${diffs.length ? "\n  " + diffs.slice(0, 3).join("\n  ") : ""}`);
+
   // stats parity: totals and due per file
   const stats = python(["scripts/study.py", "stats"], JP);
   for (const f of FILES) {
