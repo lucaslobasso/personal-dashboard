@@ -27,6 +27,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         repo, _, sub = rel.partition("/")
         # Nearest ancestor folder holding the clone (works from a git worktree too).
         base = next(((a / repo).resolve() for a in ROOT.parents if (a / repo).is_dir()), ROOT.parent / repo)
+        if sub == "__tree" and repo.startswith("personal-") and base.is_dir():  # recursive file list for the git-tree mock
+            files = [p.relative_to(base).as_posix() for p in sorted(base.rglob("*"))
+                     if p.is_file() and ".git" not in p.relative_to(base).parts and ".claude" not in p.relative_to(base).parts]
+            body = json.dumps(files).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+            return
         target = (base / sub).resolve()
         if not repo.startswith("personal-") or base not in (target, *target.parents) or ".git" in target.parts or not target.exists():
             return self.send_error(404)

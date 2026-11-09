@@ -69,6 +69,31 @@ export function errorBox(err, onRetry) {
       auth && h("a", { class: "btn", href: "#/settings" }, "Open Settings")));
 }
 
+/**
+ * Hand a job to Claude: copy the prompt and open claude.ai/code in a new tab. For agent-only
+ * work (e.g. /cart) the dashboard can't do itself. Must run inside a click handler.
+ */
+export async function handoff(prompt, { repo, url = "https://claude.ai/code" } = {}) {
+  let copied = false;
+  try { await navigator.clipboard.writeText(prompt); copied = true; } catch { /* clipboard blocked */ }
+  window.open(url, "_blank", "noopener");
+  const where = repo ? `a ${repo} session` : "the repo's session";
+  toast(copied ? `Copied “${prompt}”. Open ${where} and paste it.` : `Open ${where} and send: ${prompt}`, { timeout: 9000 });
+}
+
+/** Today as local YYYY-MM-DD (the date the data repos' scripts use). */
+export function today(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Whole days from a YYYY-MM-DD date to today (negative = future). */
+export function daysFrom(ymd) {
+  if (!ymd) return null;
+  const [y, m, d] = String(ymd).slice(0, 10).split("-").map(Number);
+  const now = new Date();
+  return Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
+}
+
 export const debounce = (fn, ms = 150) => {
   let t;
   return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };

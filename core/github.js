@@ -107,11 +107,19 @@ export async function getFile(repo, path, { optional = false } = {}) {
 
 /** List a folder: [{ name, path, type, sha }]. A missing folder is []. */
 export async function listDir(repo, path) {
+  const key = `ghdir:${repo}:${path}`;
   try {
     const r = await request("GET", `/repos/${repo}/contents/${encPath(path)}`);
-    return Array.isArray(r.json) ? r.json.map(({ name, path, type, sha }) => ({ name, path, type, sha })) : [];
+    const list = Array.isArray(r.json) ? r.json.map(({ name, path, type, sha }) => ({ name, path, type, sha })) : [];
+    store.set(key, list);
+    return list;
   } catch (e) {
     if (e.status === 404) return [];
+    const cached = store.get(key);
+    if (e.status === 0 && cached) { // offline: last listing seen, like getFile
+      globalThis.dispatchEvent?.(new Event("pd:offline"));
+      return cached;
+    }
     throw e;
   }
 }
@@ -153,6 +161,72 @@ export async function updateFile(repo, path, mutate, message) {
   }
 }
 
+/** Git blob sha of a text (sha1 of "blob <bytes>\0<content>"), to match cached copies against trees. */
+export async function gitBlobSha(text) {
+  const body = new TextEncoder().encode(text);
+  const head = new TextEncoder().encode(`blob ${body.length}\0`);
+  const buf = new Uint8Array(head.length + body.length);
+  buf.set(head); buf.set(body, head.length);
+  const digest = await crypto.subtle.digest("SHA-1", buf);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function readBlob(repo, path, sha) {
+  if (!sha) return null;
+  const cached = store.get(cacheKey(repo, path));
+  if (cached?.sha === sha) return cached.text;
+  const j = (await request("GET", `/repos/${repo}/git/blobs/${sha}`)).json;
+  const text = b64decode(j.content);
+  store.set(cacheKey(repo, path), { etag: null, sha, text });
+  return text;
+}
+
+/**
+ * Atomic multi-file commit on main via the Git Data API. Every file is read from the same
+ * head commit; `mutate(text|null)` returns new text, or null/unchanged to leave the file.
+ * If main moved before the ref update (another device, a Claude session), everything is
+ * re-read and re-applied. Returns { changed, texts: { path: finalText } }.
+ */
+// `message` may be a function of the changed paths, e.g. (paths) => `sync: <date> ${names(paths)}`.
+export const syncMessage = (date, body) => (paths) => `sync: ${date} ${paths.map((p) => p.split("/").pop()).join(" ")}\n\ndashboard: ${body}`;
+
+export async function commitFiles(repo, changes, message) {
+  const base = `/repos/${repo}/git`;
+  track(1);
+  try {
+    for (let attempt = 0; ; attempt++) {
+      const head = (await request("GET", `${base}/ref/heads/main`)).json.object.sha;
+      const commit = (await request("GET", `${base}/commits/${head}`)).json;
+      const tree = (await request("GET", `${base}/trees/${commit.tree.sha}?recursive=1`)).json;
+      const blobs = new Map(tree.tree.filter((e) => e.type === "blob").map((e) => [e.path, e.sha]));
+      const entries = [], texts = {};
+      for (const { path, mutate } of changes) {
+        const cur = await readBlob(repo, path, blobs.get(path));
+        const next = mutate(cur);
+        texts[path] = next ?? cur;
+        if (next != null && next !== cur) entries.push({ path, mode: "100644", type: "blob", content: next });
+      }
+      if (!entries.length) return { changed: false, texts };
+      const newTree = (await request("POST", `${base}/trees`, { body: { base_tree: commit.tree.sha, tree: entries } })).json;
+      const msg = typeof message === "function" ? message(entries.map((e) => e.path)) : message;
+      const newCommit = (await request("POST", `${base}/commits`, { body: { message: msg, tree: newTree.sha, parents: [head] } })).json;
+      try {
+        await request("PATCH", `${base}/refs/heads/main`, { body: { sha: newCommit.sha, force: false } });
+      } catch (e) {
+        if (e.status !== 422 || attempt >= 2) throw e; // 422 = not a fast-forward: main moved
+        await sleep(500 * (attempt + 1));
+        continue;
+      }
+      for (const { path, content } of entries) {
+        store.set(cacheKey(repo, path), { etag: null, sha: await gitBlobSha(content), text: content });
+      }
+      return { changed: true, texts };
+    }
+  } finally {
+    track(-1);
+  }
+}
+
 // One write at a time per file, so quick successive edits never race each other.
 const queues = new Map();
 export function serial(key, fn) {
@@ -179,5 +253,6 @@ export function client(repo) {
     getFile: (path, opts) => getFile(repo, path, opts),
     listDir: (path) => listDir(repo, path),
     updateFile: (path, mutate, message) => serial(`${repo}:${path}`, () => updateFile(repo, path, mutate, message)),
+    commitFiles: (changes, message) => serial(`${repo}:commit`, () => commitFiles(repo, changes, message)),
   };
 }

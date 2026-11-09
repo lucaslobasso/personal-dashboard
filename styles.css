@@ -263,5 +263,96 @@ details > summary { cursor: pointer; color: var(--text-2); font-size: 13px; padd
 .checks .ok { color: var(--ok); }
 .checks .bad { color: var(--danger); }
 
+/* ---------- shared bits (round 2) ---------- */
+.row.center, .center { justify-content: center; text-align: center; }
+.wide { width: 100%; }
+.row.two { display: grid; grid-template-columns: 1fr 1fr; }
+@media (min-width: 700px) { .row.two { grid-template-columns: repeat(4, 1fr); } }
+.error-text { color: var(--danger); }
+.nudge { color: var(--sensei); font-weight: 550; }
+.summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.tiles-2 { grid-template-columns: repeat(2, 1fr); }
+.chip-bad { background: var(--danger-soft); color: var(--danger); }
+.chip-warn { background: var(--sensei-soft); color: var(--sensei); }
+.ask { margin: 0; padding-left: 18px; font-size: 14px; }
+
+/* groceries: usual chips, pin, mark bought */
+.usual { display: flex; flex-wrap: wrap; gap: 6px; margin: -2px 0 10px; }
+.chip-add { border: 1px dashed var(--border); background: transparent; color: var(--text-2); cursor: pointer; font: inherit; font-size: 13px; padding: 4px 10px; }
+.chip-add:hover { background: var(--surface-2); }
+.chip-add.pinned { border-style: solid; color: var(--text); }
+.pin { margin-right: auto; }
+.bought-list { list-style: none; margin: 6px 0; padding: 0; }
+.bought-list li { border-top: 1px solid var(--border); }
+.bought-list label { display: flex; gap: 10px; align-items: center; padding: 8px 2px; cursor: pointer; }
+.bought-list input { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
+.bought-main { display: flex; flex-direction: column; min-width: 0; }
+
+/* japanese flashcards */
+.review-start { display: flex; flex-direction: column; gap: 10px; }
+.review-start .filters select { flex: 1 1 140px; }
+.fc { display: flex; flex-direction: column; gap: 10px; }
+.fc-top { display: flex; align-items: center; gap: 8px; }
+.fc-top .btn { margin-left: auto; min-height: 30px; }
+.fc-progress { height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.fc-progress span { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.fc-card { min-height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center;
+  background: var(--surface-2); border-radius: 12px; padding: 20px 16px; cursor: pointer; }
+.fc-front { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.fc-term { font-size: 34px; font-weight: 650; line-height: 1.25; }
+.fc-en { font-size: 22px; font-family: var(--font); }
+.fc-back { display: flex; flex-direction: column; gap: 6px; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; width: 100%; }
+.fc-term-sm { font-size: 20px; font-weight: 600; }
+.fc-meaning { font-size: 16px; }
+.fc-example { font-size: 15px; color: var(--text-2); }
+.fc-notes { max-width: 52ch; }
+.fc-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fc-grade .btn { min-height: 48px; font-size: 16px; }
+.fc-wrong { color: var(--danger); border-color: var(--danger); }
+.fc-right { color: var(--ok); border-color: var(--ok); }
+.fc-done { display: flex; flex-direction: column; gap: 8px; }
+
+/* media requests */
+.requests { list-style: none; margin: 8px 0; padding: 0; }
+.req { border-top: 1px solid var(--border); padding: 8px 0; display: flex; flex-direction: column; gap: 4px; }
+.req:first-child { border-top: 0; }
+.req-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.req-title { font-weight: 550; }
+.req-choose { background: var(--sensei-soft); color: var(--sensei); }
+.req-added, .req-exists { background: var(--accent-soft); color: var(--accent); }
+.req-error, .req-not-found { background: var(--danger-soft); color: var(--danger); }
+.cands { display: flex; flex-direction: column; gap: 6px; }
+.cand { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.cand:hover { border-color: var(--accent); }
+.cand-title { font-weight: 550; }
+.cand-ov { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* work */
+.work-sec + .work-sec { margin-top: 6px; }
+.work-sec h3 { margin: 10px 0 2px; }
+.sec-bad h3 { color: var(--danger); }
+.work-list { list-style: none; margin: 0; padding: 0; }
+.w-row { display: flex; align-items: center; gap: 6px; border-top: 1px solid var(--border); padding: 2px 0; }
+.w-row:first-child { border-top: 0; }
+.w-row.done .g-name { text-decoration: line-through; color: var(--muted); }
+.w-row.editing { background: var(--surface-2); margin: 0 -8px; padding: 8px; border-radius: 8px; }
+.w-status { width: 32px; height: 32px; flex-shrink: 0; border: 0; background: none; font-size: 17px; cursor: pointer; color: var(--muted); border-radius: 50%; }
+.w-status:hover { background: var(--surface-2); }
+.st-doing { color: var(--accent); }
+.st-waiting { color: var(--sensei); }
+.st-done { color: var(--ok); }
+.prio-high { color: var(--danger); font-weight: 700; }
+.hours-total { margin: 4px 0; }
+.meter { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+.meter span { display: block; height: 100%; background: var(--seg-learning); border-radius: 4px; }
+.day-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 8px 0 10px; }
+.day { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; }
+.day-track { height: 80px; width: 100%; max-width: 28px; display: flex; align-items: flex-end; }
+.day-bar { width: 100%; background: var(--seg-learning); border-radius: 4px 4px 0 0; min-height: 0; }
+.day-val { font-variant-numeric: tabular-nums; color: var(--text-2); }
+.day-name { color: var(--muted); }
+.day.today .day-name { color: var(--text); font-weight: 650; }
+
 /* dev preview (mock.html) */
 .mock-banner { background: var(--sensei-soft); color: var(--sensei); text-align: center; font-size: 12.5px; padding: 4px; }

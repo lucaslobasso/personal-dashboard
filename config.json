@@ -2,18 +2,22 @@
   "title": "Personal hub",
   "sources": {
     "groceries": "lucaslobasso/personal-groceries",
-    "japanese": "lucaslobasso/personal-japanese"
+    "japanese": "lucaslobasso/personal-japanese",
+    "work": "lucaslobasso/personal-work",
+    "arr": "lucaslobasso/personal-arr"
   },
   "pages": [
     {
-      "name": "Home",
+      "name": "Today",
       "columns": [
-        { "size": "small", "widgets": [
-          { "type": "groceries-list", "source": "groceries" },
-          { "type": "groceries-cart", "source": "groceries" }
-        ] },
         { "size": "full", "widgets": [
-          { "type": "japanese-search", "source": "japanese", "limit": 20, "browse": false }
+          { "type": "work-items", "source": "work", "title": "Work this week", "compact": true },
+          { "type": "japanese-due", "source": "japanese" }
+        ] },
+        { "size": "small", "widgets": [
+          { "type": "groceries-summary", "source": "groceries", "cadenceDays": 14 },
+          { "type": "work-hours", "source": "work", "compact": true, "weeklyHours": 40 },
+          { "type": "media-summary", "source": "arr" }
         ] }
       ]
     },
@@ -33,10 +37,30 @@
       "name": "Japanese",
       "columns": [
         { "size": "full", "widgets": [
-          { "type": "japanese-search", "source": "japanese", "limit": 50 }
+          { "type": "japanese-review", "source": "japanese", "size": 20 },
+          { "type": "japanese-search", "source": "japanese", "limit": 30, "browse": false }
         ] },
         { "size": "small", "widgets": [
           { "type": "japanese-stats", "source": "japanese" }
+        ] }
+      ]
+    },
+    {
+      "name": "Work",
+      "columns": [
+        { "size": "full", "widgets": [
+          { "type": "work-items", "source": "work" }
+        ] },
+        { "size": "small", "widgets": [
+          { "type": "work-hours", "source": "work", "weeklyHours": 40 }
+        ] }
+      ]
+    },
+    {
+      "name": "Media",
+      "columns": [
+        { "size": "full", "widgets": [
+          { "type": "media-requests", "source": "arr" }
         ] }
       ]
     }

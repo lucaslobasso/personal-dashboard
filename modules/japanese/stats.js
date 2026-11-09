@@ -20,6 +20,7 @@ function stackedBar(c, label) {
 export default {
   type: "japanese-stats",
   title: "Study progress",
+  watch: FILES.map((f) => `data/${f}.yaml`),
 
   async load(ctx) {
     return loadAll(ctx.gh);

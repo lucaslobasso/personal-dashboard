@@ -6,6 +6,7 @@ import { ars } from "./format.js";
 export default {
   type: "groceries-history",
   title: "Past purchases",
+  watch: ["data/pending.json"], // Mark bought changes pending + writes history in one commit
 
   async load(ctx, opts) {
     const files = (await ctx.gh.listDir("data/history")).filter((f) => f.type === "file" && f.name.endsWith(".json"));
