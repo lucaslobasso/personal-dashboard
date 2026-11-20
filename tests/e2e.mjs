@@ -207,20 +207,6 @@ try {
   check(c?.text.includes("- 〜てしまう = regret / completion\n") && c.text.endsWith("- は vs が?\n"), "editing the full notes saves the text");
   check(await waitJs(`!document.querySelector('.notes-text') && document.querySelector('.md')?.textContent.includes('completion')`), "after saving it shows the rendered notes");
 
-  // ---------- media requests ----------
-  console.log("media");
-  await js(`location.hash = '#/media';`);
-  await waitJs(`document.querySelector('[aria-label=Title]')`);
-  await js(`const f = document.querySelector('.add-form'); f.querySelector('[aria-label=Title]').value = 'Dune'; f.requestSubmit();`);
-  c = await until(async () => (await commitsOf("requests.json")).at(-1));
-  check(/\{ "id": "r-[a-z0-9]+", "title": "Dune", "type": "any", "quality": "default", "status": "queued", "candidates": \[\], "pick": null, "result": "", /.test(c?.text || ""), "request is queued in the worker's file format");
-  await js(`__mock.seed("personal-arr:state/requests.json", '[\\n  { "id": "r-x", "title": "Dune", "type": "any", "quality": "default", "status": "choose", "candidates": [{"kind": "movie", "id": 10, "title": "Dune", "year": 1984, "overview": ""}, {"kind": "movie", "id": 11, "title": "Dune", "year": 2021, "overview": "Paul Atreides"}], "pick": null, "result": "", "requestedAt": "2026-11-09T10:00:00Z", "updatedAt": "2026-11-09T10:05:00Z" }\\n]\\n');
-    document.querySelector('[aria-label=Refresh]').click();`);
-  await waitJs(`[...document.querySelectorAll('.cand')].length === 2`);
-  await js(`[...document.querySelectorAll('.cand')].find(b => b.textContent.includes('2021')).click();`);
-  c = await until(async () => (await commitsOf("requests.json")).find((x) => x.message.includes("pick Dune (2021)")));
-  check(c?.text.includes('"status": "picked", "candidates": [{"kind": "movie", "id": 10') && c.text.includes('"pick": {"kind": "movie", "id": 11}'), "picking a candidate marks it for the worker");
-
   // ---------- work ----------
   console.log("work");
   await js(`location.hash = '#/work';`);
@@ -242,7 +228,7 @@ try {
   // ---------- today ----------
   console.log("today");
   await js(`location.hash = '#/today';`);
-  check(await waitJs(`document.querySelectorAll('.card').length === 5 && !document.querySelector('.loading') && !document.querySelector('.error')`), "Today renders all five widgets without errors");
+  check(await waitJs(`document.querySelectorAll('.card').length === 4 && !document.querySelector('.loading') && !document.querySelector('.error')`), "Today renders all four widgets without errors");
   check(await waitJs(`document.body.textContent.includes('Write report') && document.body.textContent.includes('Review now') || document.body.textContent.includes('Practice')`), "Today shows this week's work and the review entry point");
   check(await waitJs(`document.querySelector('.ask')?.textContent.includes('は vs が?')`), "Today shows the Ask sensei note from the dashboard");
 
@@ -265,12 +251,12 @@ try {
   const href = await waitJs(`[...document.querySelectorAll('a')].find(a => a.textContent.startsWith('Create token'))?.href`);
   check(href?.includes("contents=write") && href.includes("expires_in=366") && href.includes("target_name=lucaslobasso"), "token link is pre-filled");
   await js(`[...document.querySelectorAll('button')].find(b => b.textContent === 'Test again').click();`);
-  check(await waitJs(`document.querySelectorAll('.checks .ok').length === 4`), "Test again reports all four repos ✓");
+  check(await waitJs(`document.querySelectorAll('.checks .ok').length === 3`), "Test again reports all three repos ✓");
 
   // ---------- layout ----------
   console.log("layout");
   await page.send("Emulation.setDeviceMetricsOverride", { width: 360, height: 780, deviceScaleFactor: 2, mobile: true });
-  for (const p of ["today", "groceries", "japanese", "work", "media", "settings"]) {
+  for (const p of ["today", "groceries", "japanese", "work", "settings"]) {
     await js(`location.hash = '#/${p}';`);
     await sleep(900);
     const w = await js(`return document.documentElement.scrollWidth;`);

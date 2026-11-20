@@ -15,14 +15,14 @@ Started 2026-11-09 after the first test pass (v1 live on phone and PC). Ordered 
   - Japanese flashcards (`due`/`record` ports, byte parity with `study.py`).
   - Usual items (pins + purchase history).
   - Cart: Ask Claude handoff + **Mark bought** (atomic 4-file commit, like /bought).
-  - Movie/series **request queue** (`arr.py requests` worker on the PC).
+  - Movie/series request queue (removed later: requests go through Seerr now).
   - New `personal-work` repo with work items + hours.
   - Atomic multi-file commits (`commitFiles`) everywhere a change spans files.
 
 ## Phase 2: next
 1. **Google Calendar (read-only)** *(M)*. A scheduled GitHub Action in a private repo (e.g. `personal-life`) fetches the calendar's *secret iCal address* (stored as an Actions secret) every ~30 min, then writes `data/calendar.json` (next 14 days, title/time/location only). No Google sign-in, no third-party script, no CSP change. Widget: today/tomorrow agenda on Today, a week view on its own page.
 2. **Pending activities + free-day planner** *(M–L, builds on 1)*. `personal-life` also holds `data/activities.json`: `{ id, title, kind: appointment|errand|hobby, durationMin, where, when (weekday hours / opening times), cadenceDays, lastDone, due, priority }`, edited by Claude skills (`/todo "turno dentista"`) and the dashboard. A **"What can I do today?"** widget takes the free slots from the calendar and ranks activities deterministically (overdue recurring > deadline soon > fits the slot and opening hours > priority > longest since last done). Tap "Done" to set `lastDone`. No LLM: the ranking rules are transparent.
-3. **Arr status branch** *(L)*. The PC worker also publishes `status.json` (queue, disk, recently added) to an orphan branch `dashboard-status`, force-pushed so history doesn't grow. It's shown on Media/Today with a "stale since…" note when the PC is off.
+3. **Arr status branch** *(L)*. The PC worker also publishes `status.json` (queue, disk, recently added) to an orphan branch `dashboard-status`, force-pushed so history doesn't grow. It's shown on Today with a "stale since…" note when the PC is off.
 4. **Service worker app shell** *(S–M)*. Instant open and fully offline, pairing with the cached-data fallback. Use a versioned cache name bumped on deploy.
 
 ## Later

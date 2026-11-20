@@ -1,6 +1,6 @@
 # personal-dashboard
 
-A small, modular personal hub over my Claude-managed data repos: [personal-groceries](https://github.com/lucaslobasso/personal-groceries), [personal-japanese](https://github.com/lucaslobasso/personal-japanese), [personal-work](https://github.com/lucaslobasso/personal-work) and [personal-arr](https://github.com/lucaslobasso/personal-arr). It covers what doesn't need the agent. **Today** gives the day at a glance. The grocery list has one-tap usual items and "mark bought". Japanese has flashcards, lesson notes, search and stats. Work has tasks, deadlines and hours. Media queues movie/series requests for the home PC.
+A small, modular personal hub over my Claude-managed data repos: [personal-groceries](https://github.com/lucaslobasso/personal-groceries), [personal-japanese](https://github.com/lucaslobasso/personal-japanese) and [personal-work](https://github.com/lucaslobasso/personal-work). It covers what doesn't need the agent. **Today** gives the day at a glance. The grocery list has one-tap usual items and "mark bought". Japanese has flashcards, lesson notes, search and stats. Work has tasks, deadlines and hours.
 
 Static site (GitHub Pages) + GitHub API. No backend, no build, no dependencies. The data repos stay private; this repo has no data or secrets.
 
@@ -21,14 +21,12 @@ Static site (GitHub Pages) + GitHub API. No backend, no build, no dependencies. 
 | `japanese-due` | Today: cards due, "Review now", and the "Ask sensei" list from the latest lesson log | – |
 | `work-items` | Tasks, tickets, deadlines: Overdue / This week / Doing / Next / Low / Done. Status cycle, inline edit (`compact`) | `data/items.json` |
 | `work-hours` | Log hours, Mon–Sun bars vs a weekly target, per-project totals (`weeklyHours`, `compact`) | `data/hours/YYYY-MM.json` |
-| `media-requests` | Queue a movie/series; pick the right match when it's ambiguous; retry/cancel (`finished`) | `state/requests.json` |
-| `media-summary` | Today: requests that need a pick, what's waiting, recent results | – |
 
-Still done by talking to Claude in each repo: `/cart` (matching Josimar products) and partial `/bought` (groceries), `/quiz` `/explain` `/log-lesson` (Japanese), `/week` planning (work). Movie requests are processed by `arr.py requests` on the home PC every ~10 min.
+Still done by talking to Claude in each repo: `/cart` (matching Josimar products) and partial `/bought` (groceries), `/quiz` `/explain` `/log-lesson` (Japanese), `/week` planning (work).
 
 ## Setup (once per device)
 1. Open the site → ⚙ Settings → **Create token on GitHub**. It opens a [pre-filled fine-grained token form](https://github.com/settings/personal-access-tokens/new?name=personal-dashboard&target_name=lucaslobasso&expires_in=366&contents=write) (name, 1-year expiry, Contents: read and write).
-   The only manual step: Repository access → *Only select repositories* → `personal-groceries`, `personal-japanese`, `personal-work`, `personal-arr` (GitHub has no URL parameter for this). Permissions cover the whole token; what the dashboard actually writes is limited per repo (see the table). Adding a repo later: edit the existing token's repository access; no new token needed.
+   The only manual step: Repository access → *Only select repositories* → `personal-groceries`, `personal-japanese` and `personal-work` (GitHub has no URL parameter for this). Permissions cover the whole token; what the dashboard actually writes is limited per repo (see the table). Adding a repo later: edit the existing token's repository access; no new token needed.
 2. **Generate token**, paste it under ⚙ Settings, then **Save & test**.
 3. Phone: browser menu → *Add to Home screen*.
 
