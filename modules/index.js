@@ -10,8 +10,6 @@ export const registry = {
   "japanese-stats": () => import("./japanese/stats.js"),
   "japanese-due": () => import("./japanese/due.js"),
   "japanese-notes": () => import("./japanese/notes.js"),
-  "media-requests": () => import("./media/requests.js"),
-  "media-summary": () => import("./media/summary.js"),
   "work-items": () => import("./work/items.js"),
   "work-hours": () => import("./work/hours.js"),
 };

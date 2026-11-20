@@ -3,8 +3,7 @@
   "sources": {
     "groceries": "lucaslobasso/personal-groceries",
     "japanese": "lucaslobasso/personal-japanese",
-    "work": "lucaslobasso/personal-work",
-    "arr": "lucaslobasso/personal-arr"
+    "work": "lucaslobasso/personal-work"
   },
   "pages": [
     {
@@ -16,8 +15,7 @@
         ] },
         { "size": "small", "widgets": [
           { "type": "groceries-summary", "source": "groceries", "cadenceDays": 14 },
-          { "type": "work-hours", "source": "work", "compact": true, "weeklyHours": 40 },
-          { "type": "media-summary", "source": "arr" }
+          { "type": "work-hours", "source": "work", "compact": true, "weeklyHours": 40 }
         ] }
       ]
     },
@@ -54,14 +52,6 @@
         ] },
         { "size": "small", "widgets": [
           { "type": "work-hours", "source": "work", "weeklyHours": 40 }
-        ] }
-      ]
-    },
-    {
-      "name": "Media",
-      "columns": [
-        { "size": "full", "widgets": [
-          { "type": "media-requests", "source": "arr" }
         ] }
       ]
     }
